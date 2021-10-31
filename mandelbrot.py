@@ -1,35 +1,21 @@
-import math
 from PIL import Image
 import numpy as np
 from datetime import datetime
 from datetime import timedelta
 
-# imaginary multiplication
-def i_mult(x, y):
-    return x[0] * y[0] - x[1] * y[1], x[0] * y[1] + x[1] * y[0]
-
-# imaginary addition
-def i_add(x,y):
-    return x[0] + y[0], x[1] + y[1]
-
-# mandlebrot function
-def mbrot(z, c):
-    return i_add(i_mult(z, z), c)
-
-# escape function - we define escape as distance from origin > 2
-def escaped(z):
-    modulus = math.sqrt(z[0] * z[0] + z[1] * z[1])
-    if modulus > 2:
-        return True
-    else:
-        return False
-
-# checks to see if a sequence diverges
-def check_diverge(z_initial, c, max_iterations=256):
-    z = z_initial
+# faster divergence check; precalculates real^2 and imaginary^2, avoids generic multiplication
+def check_diverge(z, c, max_iterations=256):
+    a = z[0]
+    b = z[1]
+    a2 = a*a
+    b2 = b*b
     for iteration in range(max_iterations):
-        z = mbrot(z, c)
-        if escaped(z):
+        a_next = a2 - b2 + c[0]
+        b_next = 2*a*b + c[1]
+        a,b = a_next, b_next
+        a2 = a*a
+        b2 = b*b
+        if a2 + b2 > 4:
             return(iteration)
     return(iteration)
 
@@ -92,7 +78,7 @@ dim_huge = (1272*2, 1200*2)
 #make_image(palette_v2, 'sm_mbrot_v2.png', dimensions=dim_small)
 #make_image(palette_v3, 'sm_mbrot_v3.png', dimensions=dim_small)
 #make_image(palette_v4, 'sm_mbrot_v4.png', dimensions=dim_small)
-#make_image(palette_v5, 'sm_mbrot_v5.png', dimensions=dim_small)
+make_image(palette_v5, 'sm_mbrot_v5_test2.png', dimensions=dim_small)
         
 # main images. each of these takes ~10min to run
 #make_image(palette_v1, 'mbrot_v1.png')
@@ -100,10 +86,3 @@ dim_huge = (1272*2, 1200*2)
 #make_image(palette_v3, 'mbrot_v3.png')
 #make_image(palette_v4, 'mbrot_v4.png')
 #make_image(palette_v5, 'mbrot_v5.png')
-
-#make_image(palette_v5, 'mbrot_v5_large.png', dimensions=dim_huge)
-
-
-
-
-
